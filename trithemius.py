@@ -14,6 +14,7 @@ class Trithemius(tk.Tk):
         self.trithemius = TrithemiusCipher()
 
         self.create_input_output_fields()
+        self.create_encryption_fields()
         # self.create_radio_buttons()
 
     def create_input_output_fields(self):

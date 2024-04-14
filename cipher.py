@@ -44,8 +44,8 @@ class CaesarCipher:
 
 
 class TrithemiusCipher:
-    ENG_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    UKR_LETTERS = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ"
+    ENG_LETTERS = " ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    UKR_LETTERS = " АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ"
 
     def linear_ab(self, text, A, B, language, operation):
         if language == "english":
@@ -111,22 +111,19 @@ class TrithemiusCipher:
             encrypt = 1
 
         length = len(alphabet)
-        to_return, password_pos = "", 0
+        to_return = ""
 
         for i in range(len(text)):
             if text[i].upper() in alphabet:
                 idx = (alphabet.index(text[i].upper()) + (-1) ** encrypt * (alphabet.index(
-                    password[password_pos].upper())) + 1)
+                    password[i % len(password)].upper())))
                 idx %= length
 
                 if idx < 0:
                     idx += length
 
                 to_return += alphabet[idx].lower()
-                idx += 1
 
-                if password_pos >= len(password):
-                    password_pos = 0
             else:
                 to_return += text[i]
 
