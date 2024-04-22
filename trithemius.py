@@ -2,7 +2,7 @@ from cipher import TrithemiusCipher
 from main import Main
 import tkinter as tk
 from tkinter import ttk, messagebox
-
+import re
 
 class Trithemius(Main):
     def __init__(self):
@@ -60,8 +60,16 @@ class Trithemius(Main):
         key_output.grid(row=5, column=0, padx=5, pady=5, sticky="w")
 
         def perform_attack():
-            original_message = input_text.get("1.0", tk.END).strip()
+            original_message = input_text.get("1.0", tk.END + "-1c").strip()
+            if original_message.count(' ') == len(original_message) or re.search(r'(.)\1{3,}', original_message):
+                messagebox.showerror("Помилка", "Введіть коректний текст")
+                return
+
             encrypted_message = output_text.get("1.0", tk.END).strip()
+            if encrypted_message.count(' ') == len(encrypted_message) or re.search(r'(.)\1{3,}', encrypted_message):
+                messagebox.showerror("Помилка", "Введіть коректний текст")
+                return
+
 
             if len(original_message) != len(encrypted_message):
                 messagebox.showerror("Помилка", "Довжина оригінального та зашифрованого повідомлень не співпадає")
@@ -109,7 +117,7 @@ class Trithemius(Main):
         output_label = ttk.Label(input_output_panel, text="Результат")
         self.output_text = tk.Text(input_output_panel, height=10, width=40, wrap=tk.WORD)
         output_scrollbar = ttk.Scrollbar(input_output_panel, command=self.output_text.yview)
-        self.output_text.config(yscrollcommand=output_scrollbar.set)
+        self.output_text.config(yscrollcommand=output_scrollbar.set, state=tk.DISABLED)
 
         input_label.grid(row=0, column=0, padx=5, pady=5)
         self.input_text.grid(row=1, column=0, padx=5, pady=5)
@@ -198,6 +206,30 @@ class Trithemius(Main):
         input_text = self.input_text.get("1.0", tk.END + "-1c")
         type_var = self.type_var.get()
         language = self.language_var.get()
+
+        if not type_var:
+            messagebox.showerror("Помилка", "Виберіть тип шифрування")
+            return
+
+        if type_var == "linear" or type_var == "nonlinear":
+            for entry in self.coefficient_entries:
+                try:
+                    coefficient = int(entry.get())
+                except ValueError:
+                    messagebox.showerror("Помилка", "Коефіцієнти повинні бути цілими числами")
+                    return
+
+        if type_var == "password":
+            password = self.coefficient_entries[0].get()
+            if not password.isalpha():
+                messagebox.showerror("Помилка", "Гасло повинно містити лише літери")
+                return
+
+        if True:
+            input_text = self.input_text.get("1.0", tk.END + "-1c").strip()
+            if input_text.count(' ') == len(input_text) or re.search(r'(.)\1{3,}', input_text):
+                messagebox.showerror("Помилка", "Введіть коректний текст")
+                return
 
         if type_var == "linear":
             a = int(self.coefficient_entries[0].get())
