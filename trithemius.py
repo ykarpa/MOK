@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import re
 
+
 class Trithemius(Main):
     def __init__(self):
         super().__init__()
@@ -31,7 +32,6 @@ class Trithemius(Main):
         file_menu.add_command(label="Зберегти", command=super().save_file)
         file_menu.add_command(label="Друк", command=super().print_file)
         self.menubar.add_cascade(label="Файл", menu=file_menu)
-
 
         self.menubar.add_command(label="Атака", command=self.launch_attack_window)
         self.menubar.add_command(label="Статистика", command=super().show_statistics_window)

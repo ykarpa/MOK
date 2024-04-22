@@ -119,14 +119,12 @@ class XOR(Main):
             widget.grid_forget()
 
     def clear_input_widgets(self):
-        # Clear any widgets from the input entry selection
         self.file_label.pack_forget()
         self.step_spinbox.pack_forget()
         for widget in self.winfo_children():
             widget.destroy()
 
     def clear_file_widgets(self):
-        # Clear any widgets from the file input selection
         self.input_entry.pack_forget()
         for widget in self.winfo_children():
             widget.destroy()
@@ -141,33 +139,22 @@ class XOR(Main):
         self.input_entry.config(text=str(self.gamma.generate_key(self.input_text.get("1.0", tk.END + "-1c"))))
 
     def encrypt(self):
-        # Implement encryption logic here
         pass
 
     def decrypt(self):
-        # Implement decryption logic here
         pass
 
-    def encrypt_image(self):
-        # Implement image encryption logic here
-        pass
-
-    def decrypt_image(self):
-        # Implement image decryption logic here
-        pass
 
     def update_output(self):
         operation = self.operation_var.get()
         input_text = self.input_text.get("1.0", tk.END + "-1c")
         gamma_key = self.gamma_entry.get()
 
-        # Your encryption/decryption logic here
         if operation == "encrypt":
             result = self.trithemius.encrypt(input_text, gamma_key)
         else:
             result = self.trithemius.decrypt(input_text, gamma_key)
 
-        # Update output text
         self.output_text.config(state=tk.NORMAL)
         self.output_text.delete("1.0", tk.END)
         self.output_text.insert(tk.END, result)

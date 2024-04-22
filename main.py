@@ -27,9 +27,9 @@ class Main(tk.Tk):
         self.create_buttons()
 
     def create_buttons(self):
-        button_functions = [self.caesar_cipher, self.trithemius_cipher, self.xor_cipher]
+        button_functions = [self.caesar_cipher, self.trithemius_cipher, self.xor_cipher, self.knapsack_cipher]
 
-        for i, button_text in enumerate(["Шифр Цезаря", "Шифр Тритеміуса", "Шифр Гамування"]):
+        for i, button_text in enumerate(["Шифр Цезаря", "Шифр Тритеміуса", "Шифр Гамування", "Задача рюкзака"]):
             button = tk.Button(self.button_frame, text=button_text, command=button_functions[i], width=20, height=2)
             button.grid(row=i, column=0, pady=10)
 
@@ -50,6 +50,10 @@ class Main(tk.Tk):
         from xor import XOR
         app = XOR()
         app.mainloop()
+
+    def knapsack_cipher(self):
+        # self.destroy()
+        pass
 
     def create_file(self):
         self.input_text.delete("1.0", tk.END)
