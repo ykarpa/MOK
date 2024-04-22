@@ -32,7 +32,7 @@ class Caesar(Main):
 
         # self.menubar.add_command(label="Шифрувати зображення", command=self.encrypt_image)
         self.menubar.add_command(label="Атака", command=self.brute_force_attack)
-        self.menubar.add_command(label="Статистика", command=super().show_statistics)
+        self.menubar.add_command(label="Статистика", command=super().show_statistics_window)
         self.menubar.add_command(label="Розробник", command=super().show_developer_info)
         self.menubar.add_command(label="Вихід", command=super().confirm_exit)
 

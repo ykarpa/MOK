@@ -1,3 +1,4 @@
+import json
 import tkinter as tk
 from tkinter import ttk, Spinbox, filedialog, messagebox
 from tkinter import Toplevel, Label, colorchooser
@@ -92,56 +93,45 @@ class Main(tk.Tk):
         text_to_print = text_widget.get("1.0", tk.END)
         print("Друкуємо текст:\n", text_to_print)
 
-    def show_statistics(self):
-        input_text = self.input_text.get("1.0", tk.END + "-1c")
-        language = self.language_var.get()
-
-        if language == "english":
-            frequency_table = self.build_frequency_table(input_text, "english")
-        else:
-            frequency_table = self.build_frequency_table(input_text, "ukrainian")
-
-        self.show_statistics_window(frequency_table)
-
-
-    def build_frequency_table(self, text, language):
+    def build_frequency_table(self, language):
         frequency_table = Counter()
-        total_letters = 0
 
         if language == "english":
-            alphabet = "abcdefghijklmnopqrstuvwxyz"
-        else:  # Ukrainian
-            alphabet = "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя"
-
-        for char in alphabet:
-            frequency_table[char.lower()] = 0
-
-        for char in text:
-            if char.lower() in alphabet:
-                frequency_table[char.lower()] += 1
-                total_letters += 1
-
-        for char in frequency_table:
-            frequency_table[char] /= total_letters if total_letters > 0 else 1
+            with open("english_frequencies.json", "r", encoding="utf-8") as file:
+                frequency_table.update(json.load(file))
+        else:
+            with open("ukrainian_frequencies.json", "r", encoding="utf-8") as file:
+                frequency_table.update(json.load(file))
 
         return frequency_table
 
-    def show_statistics_window(self, frequency_table):
-        stats_window = Toplevel(self)
+    def show_statistics_window(self):
+        stats_window = tk.Toplevel(self)
         stats_window.title("Статистика частот літер")
 
-        text_widget = tk.Text(stats_window, width=30, height=20, wrap=tk.WORD)
-        text_widget.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        language_frame = ttk.Frame(stats_window)
+        language_frame.grid(row=0, column=0, padx=5, pady=5)
 
-        text_widget.insert(tk.END, "Літера\t\tЧастота\n")
-        text_widget.insert(tk.END, "-----------------------------\n")
+        english_button = ttk.Button(language_frame, text="Англійська", width=15, command=lambda: self.display_frequency_table(self.build_frequency_table("english")))
+        english_button.grid(row=0, column=0)
+
+        ukrainian_button = ttk.Button(language_frame, text="Українська", width=15, command=lambda: self.display_frequency_table(self.build_frequency_table("ukrainian")))
+        ukrainian_button.grid(row=0, column=1)
+
+        self.text_widget = tk.Text(stats_window, width=30, height=20, wrap=tk.WORD)
+        self.text_widget.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+
+        self.scrollbar = ttk.Scrollbar(stats_window, orient=tk.VERTICAL, command=self.text_widget.yview)
+        self.scrollbar.grid(row=1, column=1, sticky="ns")
+        self.text_widget.config(yscrollcommand=self.scrollbar.set)
+
+    def display_frequency_table(self, frequency_table):
+        self.text_widget.delete("1.0", tk.END)
+        self.text_widget.insert(tk.END, "   Літера\t\tЧастота\n")
+        self.text_widget.insert(tk.END, "-----------------------------\n")
 
         for char, frequency in frequency_table.items():
-            text_widget.insert(tk.END, f"{char}\t\t{frequency:.2%}\n")
-
-        scrollbar = ttk.Scrollbar(stats_window, orient=tk.VERTICAL, command=text_widget.yview)
-        scrollbar.grid(row=0, column=1, sticky="ns")
-        text_widget.config(yscrollcommand=scrollbar.set)
+            self.text_widget.insert(tk.END, f"     {char}\t\t {frequency}%\n")
 
     def show_developer_info(self):
         dev_info_window = Toplevel(self)

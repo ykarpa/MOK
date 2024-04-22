@@ -34,7 +34,7 @@ class Trithemius(Main):
 
 
         self.menubar.add_command(label="Атака", command=self.launch_attack_window)
-        self.menubar.add_command(label="Статистика", command=super().show_statistics)
+        self.menubar.add_command(label="Статистика", command=super().show_statistics_window)
         self.menubar.add_command(label="Розробник", command=super().show_developer_info)
         self.menubar.add_command(label="Вихід", command=self.confirm_exit)
 
