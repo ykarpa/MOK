@@ -1,3 +1,6 @@
+import random
+
+
 class CaesarCipher:
     ENG_LETTERS = " ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     UA_LETTERS = " АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ"
@@ -200,3 +203,26 @@ class TrithemiusCipher:
                     return to_return
 
             text_pos += 1
+
+
+class GammaCipher:
+    def generate_key(self, text):
+        key = ""
+        for _ in range(len(text)):
+            ascii_symbol = random.randint(10, 1000)
+            while chr(ascii_symbol) == text[_]:
+                ascii_symbol = random.randint(10, 1000)
+            key += chr(ascii_symbol)
+        return key
+
+    def g_encrypt(self, plaintext, gamma):
+        result = ""
+        for i in range(len(plaintext)):
+            result += chr(ord(plaintext[i]) ^ ord(gamma[i % len(gamma)]))
+        return result
+
+    def g_decrypt(self, ciphertext, gamma):
+        result = ""
+        for i in range(len(ciphertext)):
+            result += chr(ord(ciphertext[i]) ^ ord(gamma[i % len(gamma)]))
+        return result

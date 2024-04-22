@@ -16,24 +16,19 @@ class Main(tk.Tk):
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
 
-        # Розрахунок координат верхнього лівого кута вікна для розміщення його у центрі
         x = (screen_width - 700) // 2
         y = (screen_height - 500) // 2
 
-        # Встановлення розмірів та позиції вікна
         self.geometry("700x500+{}+{}".format(x, y))
 
-        # Створення контейнера для кнопок
         self.button_frame = tk.Frame(self)
         self.button_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-        self.create_buttons()  # Створення кнопок
+        self.create_buttons()
 
     def create_buttons(self):
-        # Функції для обробки натискань кнопок
         button_functions = [self.caesar_cipher, self.trithemius_cipher, self.xor_cipher]
 
-        # Створення кнопок і розміщення їх у вікні
         for i, button_text in enumerate(["Шифр Цезаря", "Шифр Тритеміуса", "Шифр Гамування"]):
             button = tk.Button(self.button_frame, text=button_text, command=button_functions[i], width=20, height=2)
             button.grid(row=i, column=0, pady=10)
@@ -51,10 +46,10 @@ class Main(tk.Tk):
         app.mainloop()
 
     def xor_cipher(self):
-        # Додати код для реалізації шифру Гамування
-        pass
-
-        # Додаткові методи для обробки команд меню
+        self.destroy()
+        from xor import XOR
+        app = XOR()
+        app.mainloop()
 
     def create_file(self):
         self.input_text.delete("1.0", tk.END)
