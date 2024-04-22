@@ -103,6 +103,7 @@ class Main(tk.Tk):
 
         self.show_statistics_window(frequency_table)
 
+
     def build_frequency_table(self, text, language):
         frequency_table = Counter()
         total_letters = 0
@@ -165,7 +166,7 @@ class Main(tk.Tk):
     def confirm_exit(self):
         result = messagebox.askyesno("Підтвердження виходу", "Ви впевнені, що хочете вийти?")
         if result:
-            self.quit()
+            self.destroy()
 
 
 if __name__ == "__main__":

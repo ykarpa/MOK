@@ -128,3 +128,75 @@ class TrithemiusCipher:
                 to_return += text[i]
 
         return to_return
+
+    def linear_attack(self, original_message, encoded_message, language):
+        if language == "english":
+            alphabet = self.ENG_LETTERS
+        else:
+            alphabet = self.UKR_LETTERS
+
+        A, B = 0, 0
+        n = len(alphabet)
+
+        for i in range(n):
+            for j in range(n):
+                if (j - i) % n == 0:
+                    continue
+                if self.linear_ab(original_message, i, j, language, "encrypt") == encoded_message:
+                    A, B = i, j
+                    break
+            if A != 0 or B != 0:
+                break
+
+        return A, B
+
+    def non_linear_attack(self, original_message, encoded_message, language):
+        if language == "english":
+            alphabet = self.ENG_LETTERS
+        else:
+            alphabet = self.UKR_LETTERS
+
+        A, B, C = 0, 0, 0
+        n = len(alphabet)
+
+        for i in range(n):
+            for j in range(n):
+                for k in range(n):
+                    if (k - i * (j ** 2) - j * i + k) % n == 0:
+                        continue
+                    if self.non_linear_abc(original_message, i, j, k, language, "encrypt") == encoded_message:
+                        A, B, C = i, j, k
+                        break
+                if A != 0 or B != 0 or C != 0:
+                    break
+            if A != 0 or B != 0 or C != 0:
+                break
+
+        return A, B, C
+
+    def password_attack(self, original_message, encoded_message, language):
+        if language == "english":
+            alphabet = self.ENG_LETTERS
+        else:
+            alphabet = self.UKR_LETTERS
+
+        length = len(alphabet)
+        decrypted_password = ""
+        to_return = ""
+
+        text_pos = 0
+
+        while text_pos < len(encoded_message):
+
+            if encoded_message[text_pos].upper() in alphabet and original_message[text_pos].upper() in alphabet:
+                encrypted_idx = alphabet.index(encoded_message[text_pos].upper())
+                original_idx = alphabet.index(original_message[text_pos].upper())
+                diff = (encrypted_idx - original_idx) % length
+                decrypted_password += alphabet[diff]
+
+                decrypted_text = self.password(original_message, decrypted_password, language, "encrypt")
+                if decrypted_text == encoded_message:
+                    to_return += decrypted_password.lower()
+                    return to_return
+
+            text_pos += 1

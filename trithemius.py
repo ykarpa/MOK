@@ -1,10 +1,10 @@
 from cipher import TrithemiusCipher
 from main import Main
 import tkinter as tk
-from tkinter import ttk, Spinbox
+from tkinter import ttk, messagebox
 
 
-class Trithemius(tk.Tk):
+class Trithemius(Main):
     def __init__(self):
         super().__init__()
 
@@ -13,9 +13,89 @@ class Trithemius(tk.Tk):
 
         self.trithemius = TrithemiusCipher()
 
+        self.create_menu()
         self.create_input_output_fields()
         self.create_encryption_fields()
-        # self.create_radio_buttons()
+
+        self.create_buttons()
+
+    def create_buttons(self):
+        pass
+
+    def create_menu(self):
+        self.menubar = tk.Menu(self)
+
+        file_menu = tk.Menu(self.menubar, tearoff=0)
+        file_menu.add_command(label="Створити", command=super().create_file)
+        file_menu.add_command(label="Відкрити", command=super().open_file)
+        file_menu.add_command(label="Зберегти", command=super().save_file)
+        file_menu.add_command(label="Друк", command=super().print_file)
+        self.menubar.add_cascade(label="Файл", menu=file_menu)
+
+
+        self.menubar.add_command(label="Атака", command=self.launch_attack_window)
+        self.menubar.add_command(label="Статистика", command=super().show_statistics)
+        self.menubar.add_command(label="Розробник", command=super().show_developer_info)
+        self.menubar.add_command(label="Вихід", command=self.confirm_exit)
+
+        self.config(menu=self.menubar)
+
+    def launch_attack_window(self):
+        attack_window = tk.Toplevel(self)
+        attack_window.title("Атака на шифр Тритеміуса")
+
+        input_label = ttk.Label(attack_window, text="Оригінальне повідомлення:")
+        input_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        input_text = tk.Text(attack_window, height=5, width=50, wrap=tk.WORD)
+        input_text.grid(row=1, column=0, padx=5, pady=5)
+
+        output_label = ttk.Label(attack_window, text="Зашифроване повідомлення:")
+        output_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
+        output_text = tk.Text(attack_window, height=5, width=50, wrap=tk.WORD)
+        output_text.grid(row=3, column=0, padx=5, pady=5)
+
+        key_label = ttk.Label(attack_window, text="Можливі ключі:")
+        key_label.grid(row=4, column=0, padx=5, pady=5, sticky="w")
+        key_output = ttk.Label(attack_window, text="")
+        key_output.grid(row=5, column=0, padx=5, pady=5, sticky="w")
+
+        def perform_attack():
+            original_message = input_text.get("1.0", tk.END).strip()
+            encrypted_message = output_text.get("1.0", tk.END).strip()
+
+            if len(original_message) != len(encrypted_message):
+                messagebox.showerror("Помилка", "Довжина оригінального та зашифрованого повідомлень не співпадає")
+                return
+
+            to_return = ""
+            linear_key = self.trithemius.linear_attack(original_message, encrypted_message, "english")
+            non_linear_key = self.trithemius.non_linear_attack(original_message, encrypted_message, "english")
+            password_key = self.trithemius.password_attack(original_message, encrypted_message, "english")
+
+            if linear_key and non_linear_key and password_key:
+                to_return += "Коефіцієнти лінійного рівняння: A = {}, B = {}\n".format(linear_key[0], linear_key[1])
+                to_return += "Коефіцієнти нелінійного рівняння: A = {}, B = {}, C = {}\n".format(non_linear_key[0],
+                                                                                                 non_linear_key[1],
+                                                                                                 non_linear_key[2])
+                to_return += "Гасло: {}".format(password_key)
+            else:
+                linear_key = self.trithemius.linear_attack(original_message, encrypted_message, "ukrainian")
+                non_linear_key = self.trithemius.non_linear_attack(original_message, encrypted_message, "ukrainian")
+                password_key = self.trithemius.password_attack(original_message, encrypted_message, "ukrainian")
+
+                if linear_key and non_linear_key and password_key:
+                    to_return += "Коефіцієнти лінійного рівняння: A = {}, B = {}\n".format(linear_key[0], linear_key[1])
+                    to_return += "Коефіцієнти нелінійного рівняння: A = {}, B = {}, C = {}\n".format(non_linear_key[0],
+                                                                                                     non_linear_key[1],
+                                                                                                     non_linear_key[2])
+                    to_return += "Гасло: {}".format(password_key)
+                else:
+                    to_return = "Помилка: ключ не знайдено"
+
+            key_output.config(text=to_return)
+
+        attack_button = ttk.Button(attack_window, text="Запустити атаку", command=perform_attack)
+        attack_button.grid(row=6, column=0, padx=5, pady=5)
 
     def create_input_output_fields(self):
         input_output_panel = ttk.Frame(self)
@@ -29,7 +109,7 @@ class Trithemius(tk.Tk):
         output_label = ttk.Label(input_output_panel, text="Результат")
         self.output_text = tk.Text(input_output_panel, height=10, width=40, wrap=tk.WORD)
         output_scrollbar = ttk.Scrollbar(input_output_panel, command=self.output_text.yview)
-        self.output_text.config(yscrollcommand=output_scrollbar.set)  # , state=tk.DISABLED)
+        self.output_text.config(yscrollcommand=output_scrollbar.set)
 
         input_label.grid(row=0, column=0, padx=5, pady=5)
         self.input_text.grid(row=1, column=0, padx=5, pady=5)
@@ -58,7 +138,6 @@ class Trithemius(tk.Tk):
         encrypt_radio.grid(row=1, column=0, padx=5, pady=5, sticky="w")
         decrypt_radio.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
-        # Додавання додаткових полів залежно від вибору типу шифрування
         self.coefficient_entries = []
         self.coefficient_entry_labels = []
 
@@ -75,7 +154,7 @@ class Trithemius(tk.Tk):
             if self.type_var.get() == "linear":
                 show_coefficient_entries()
                 for i in range(2):
-                    entry_label = ttk.Label(encryption_panel, text=f"Коефіцієнт {self.trithemius.ENG_LETTERS[i]}:")
+                    entry_label = ttk.Label(encryption_panel, text=f"Коефіцієнт {self.trithemius.ENG_LETTERS[i+1]}:")
                     entry_label.grid(row=3 + i, column=0, padx=5, pady=5, sticky="w")
                     entry = ttk.Entry(encryption_panel)
                     entry.grid(row=3 + i, column=1, padx=5, pady=5, sticky="w")
@@ -84,7 +163,7 @@ class Trithemius(tk.Tk):
             elif self.type_var.get() == "nonlinear":
                 show_coefficient_entries()
                 for i in range(3):
-                    entry_label = ttk.Label(encryption_panel, text=f"Коефіцієнт {self.trithemius.ENG_LETTERS[i]}:")
+                    entry_label = ttk.Label(encryption_panel, text=f"Коефіцієнт {self.trithemius.ENG_LETTERS[i+1]}:")
                     entry_label.grid(row=3 + i, column=0, padx=5, pady=5, sticky="w")
                     entry = ttk.Entry(encryption_panel)
                     entry.grid(row=3 + i, column=1, padx=5, pady=5, sticky="w")
@@ -115,20 +194,6 @@ class Trithemius(tk.Tk):
                                     command=lambda: self.update_output(operation_var.get()), width=20)
         execute_button.grid(row=10, column=0, columnspan=3, pady=10)
 
-    # def create_radio_buttons(self):
-    #     radio_panel = ttk.Frame(self)
-    #     radio_panel.grid(row=0, column=1, padx=10, pady=10, sticky="n")
-    #
-    #     self.radio_var = tk.StringVar(value="enter")
-    #
-    #     enter_radio = ttk.Radiobutton(radio_panel, text="Ввести", value="enter", variable=self.radio_var,
-    #                                   command=self.show_input_entry)
-    #     file_radio = ttk.Radiobutton(radio_panel, text="Прочитати з файлу", value="file", variable=self.radio_var,
-    #                                  command=self.show_file_input)
-    #
-    #     enter_radio.grid(row=0, column=0, padx=5, pady=5, sticky="w")
-    #     file_radio.grid(row=1, column=0, padx=5, pady=5, sticky="w")
-
     def update_output(self, operation):
         input_text = self.input_text.get("1.0", tk.END + "-1c")
         type_var = self.type_var.get()
@@ -138,7 +203,6 @@ class Trithemius(tk.Tk):
             a = int(self.coefficient_entries[0].get())
             b = int(self.coefficient_entries[1].get())
             result = self.trithemius.linear_ab(input_text, a, b, language, operation)
-            print(result)
         elif type_var == "nonlinear":
             a = int(self.coefficient_entries[0].get())
             b = int(self.coefficient_entries[1].get())
