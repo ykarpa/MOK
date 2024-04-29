@@ -208,10 +208,8 @@ class TrithemiusCipher:
 class GammaCipher:
     def generate_key(self, text):
         key = ""
-        for _ in range(len(text)):
-            ascii_symbol = random.randint(10, 1000)
-            while chr(ascii_symbol) == text[_]:
-                ascii_symbol = random.randint(10, 1000)
+        for _ in range(len(text) + random.randint(0, 10)):
+            ascii_symbol = random.randint(0, 1000)
             key += chr(ascii_symbol)
         return key
 

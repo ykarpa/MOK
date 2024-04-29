@@ -1,5 +1,6 @@
+import os
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, messagebox
 from cipher import GammaCipher
 from main import Main
 
@@ -16,6 +17,9 @@ class XOR(Main):
         self.create_menu()
         self.create_input_output_fields()
         self.create_radio_buttons()
+
+        self.entry_panel = None
+        self.file_panel = None
 
         self.create_buttons()
 
@@ -75,87 +79,117 @@ class XOR(Main):
         file_radio.grid(row=1, column=0, padx=5, pady=5, sticky="w")
 
     def show_input_entry(self):
-        entry_panel = ttk.Frame(self.radio_panel)
-        entry_panel.grid(row=2, column=0, padx=10, pady=10, sticky="s")
+        if self.file_panel:
+            self.file_panel.grid_forget()
+        if not self.entry_panel:
+            self.entry_panel = ttk.Frame(self.radio_panel)
 
-        input_entry_label = ttk.Label(entry_panel, text="Введіть гамма ключ:")
-        input_entry_label.grid(row=0, column=0, pady=5)
+            input_entry_label = ttk.Label(self.entry_panel, text="Введіть гамма ключ:")
+            input_entry_label.grid(row=0, column=0, pady=5)
 
-        self.input_entry = ttk.Entry(entry_panel)
-        self.input_entry.grid(row=0, column=1, pady=5)
+            self.input_entry = ttk.Entry(self.entry_panel)
+            self.input_entry.grid(row=0, column=1, pady=5)
 
-        generate_button = ttk.Button(entry_panel, text="Згенерувати", command=self.generate_key)
-        generate_button.grid(row=1, column=0, columnspan=2, pady=5)
+            generate_button = ttk.Button(self.entry_panel, text="Згенерувати", command=self.generate_key)
+            generate_button.grid(row=1, column=0, columnspan=2, pady=5)
 
-        encrypt_button = ttk.Button(entry_panel, text="Зашифрувати", command=self.encrypt)
-        encrypt_button.grid(row=2, column=0, columnspan=2, pady=5)
+            encrypt_button = ttk.Button(self.entry_panel, text="Зашифрувати", command=self.encrypt)
+            encrypt_button.grid(row=2, column=0, columnspan=2, pady=5)
 
-        decrypt_button = ttk.Button(entry_panel, text="Розшифрувати", command=self.decrypt)
-        decrypt_button.grid(row=3, column=0, columnspan=2, pady=5)
+            decrypt_button = ttk.Button(self.entry_panel, text="Розшифрувати", command=self.decrypt)
+            decrypt_button.grid(row=3, column=0, columnspan=2, pady=5)
+
+        self.entry_panel.grid(row=2, column=0, padx=10, pady=10, sticky="s")
 
     def show_file_input(self):
-        file_panel = ttk.Frame(self.radio_panel)
-        file_panel.grid(row=2, column=0, padx=10, pady=10, sticky="s")
+        if self.entry_panel:
+            self.entry_panel.grid_forget()
+        if not self.file_panel:
+            self.file_panel = ttk.Frame(self.radio_panel)
 
-        open_file_button = ttk.Button(file_panel, text="Відкрити файл", command=self.open_file)
-        open_file_button.grid(row=1, column=0, columnspan=2, pady=5)
+            open_file_button = ttk.Button(self.file_panel, text="Відкрити файл", command=self.open_file)
+            open_file_button.grid(row=1, column=0, columnspan=2, pady=5)
 
-        self.file_label = ttk.Label(file_panel, text="")
-        self.file_label.grid(row=2, column=0, columnspan=2, pady=5)
+            self.file_label = ttk.Label(self.file_panel, text="")
+            self.file_label.grid(row=2, column=0, columnspan=2, pady=5)
 
-        self.step_var = tk.IntVar(value=1)
-
-        self.step_spinbox = tk.Spinbox(file_panel, from_=1, to=100, textvariable=self.step_var)
-        self.step_spinbox.grid(row=3, column=0, columnspan=2, pady=5)
-
-        encrypt_button = ttk.Button(file_panel, text="Зашифрувати", command=self.encrypt_image)
-        encrypt_button.grid(row=4, column=0, columnspan=2, pady=5)
-
-        decrypt_button = ttk.Button(file_panel, text="Розшифрувати", command=self.decrypt_image)
-        decrypt_button.grid(row=5, column=0, columnspan=2, pady=5)
-
-    def clear_widgets(self):
-        for widget in self.winfo_children():
-            widget.grid_forget()
-
-    def clear_input_widgets(self):
-        self.file_label.pack_forget()
-        self.step_spinbox.pack_forget()
-        for widget in self.winfo_children():
-            widget.destroy()
-
-    def clear_file_widgets(self):
-        self.input_entry.pack_forget()
-        for widget in self.winfo_children():
-            widget.destroy()
+        self.file_panel.grid(row=2, column=0, padx=10, pady=10, sticky="s")
 
     def open_file(self):
-        file_path = filedialog.askopenfilename(defaultextension=".txt", filetypes=[("Text files", "*.txt")])
-        if file_path:
-            self.file_label.config(text="Файл: " + file_path)
+        self.file_path = filedialog.askopenfilename(defaultextension=".txt", filetypes=[("Text files", "*.txt")])
+        if self.file_path:
+            file_name = os.path.basename(self.file_path)
+            self.file_label.config(text="Файл: " + file_name)
+            panel = ttk.Frame(self.file_panel)
+            panel.grid(row=3, column=0, padx=10, pady=10, sticky="s")
+
+            self.step_var = tk.IntVar(value=0)
+
+            self.step_spinbox = tk.Spinbox(panel, from_=1, to=100, textvariable=self.step_var,
+                                           command=self.on_spinbox_change)
+            self.step_spinbox.grid(row=0, column=0, padx=10, pady=10)
+
+            self.selected_gamma_entry = ttk.Entry(panel)
+            self.selected_gamma_entry.grid(row=0, column=1, padx=10, pady=10)
+
+            generate_key_button = ttk.Button(self.file_panel, text="Згенерувати", command=self.generate_key_file)
+            generate_key_button.grid(row=4, column=0, columnspan=2, pady=5)
+
+            encrypt_button = ttk.Button(self.file_panel, text="Зашифрувати", command=self.encrypt)
+            encrypt_button.grid(row=5, column=0, columnspan=2, pady=5)
+
+            decrypt_button = ttk.Button(self.file_panel, text="Розшифрувати", command=self.decrypt)
+            decrypt_button.grid(row=6, column=0, columnspan=2, pady=5)
+        self.on_spinbox_change()
 
     def generate_key(self):
-        # self.gamma.generate_key(self.input_text.get("1.0", tk.END + "-1c"))
-        self.input_entry.config(text=str(self.gamma.generate_key(self.input_text.get("1.0", tk.END + "-1c"))))
+        key = self.gamma.generate_key(self.input_text.get("1.0", tk.END + "-1c"))
+        self.input_entry.delete(0, tk.END)
+        self.input_entry.insert(0, key)
+
+    def generate_key_file(self):
+        num_gammas = int(self.step_spinbox.get())
+        text = self.input_text.get("1.0", tk.END + "-1c")
+        gammas = [self.gamma.generate_key(text) for _ in range(num_gammas)]
+        with open(self.file_path, "w", encoding="utf-16") as file:
+            for gamma in gammas:
+                file.write(gamma + "\n\n")
+        messagebox.showinfo("Повідомлення", f"Згенеровано {num_gammas} ключів, збережено у файл {self.file_path}")
+        self.on_spinbox_change()
+
+    def on_spinbox_change(self):
+        selected_row = int(self.step_var.get())
+        with open(self.file_path, "r", encoding="utf-16") as file:
+            gammas = file.readlines()
+            if selected_row <= len(gammas):
+                selected_gamma = gammas[selected_row - 1].strip()
+                self.selected_gamma_entry.delete(0, tk.END)
+                self.selected_gamma_entry.insert(0, selected_gamma)
+            else:
+                self.selected_gamma_entry.delete(0, tk.END)
+                self.selected_gamma_entry.insert(0, "")
 
     def encrypt(self):
-        pass
-
-    def decrypt(self):
-        pass
-
-
-    def update_output(self):
-        operation = self.operation_var.get()
-        input_text = self.input_text.get("1.0", tk.END + "-1c")
-        gamma_key = self.gamma_entry.get()
-
-        if operation == "encrypt":
-            result = self.trithemius.encrypt(input_text, gamma_key)
-        else:
-            result = self.trithemius.decrypt(input_text, gamma_key)
-
+        if self.radio_var.get() == "enter":
+            gamma_key = self.input_entry.get()
+        elif self.radio_var.get() == "file":
+            gamma_key = self.selected_gamma_entry.get()
+        plaintext = self.input_text.get("1.0", tk.END + "-1c")
+        ciphertext = self.gamma.g_encrypt(plaintext, gamma_key)
         self.output_text.config(state=tk.NORMAL)
         self.output_text.delete("1.0", tk.END)
-        self.output_text.insert(tk.END, result)
+        self.output_text.insert(tk.END, ciphertext)
         self.output_text.config(state=tk.DISABLED)
+
+    def decrypt(self):
+        if self.radio_var.get() == "enter":
+            gamma_key = self.input_entry.get()
+        elif self.radio_var.get() == "file":
+            gamma_key = self.selected_gamma_entry.get()
+        ciphertext = self.input_text.get("1.0", tk.END + "-1c")
+        plaintext = self.gamma.g_decrypt(ciphertext, gamma_key)
+        self.output_text.config(state=tk.NORMAL)
+        self.output_text.delete("1.0", tk.END)
+        self.output_text.insert(tk.END, plaintext)
+        self.output_text.config(state=tk.DISABLED)
+
