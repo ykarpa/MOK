@@ -46,6 +46,7 @@ class XOR(Main):
         input_output_panel = ttk.Frame(self)
         input_output_panel.grid(row=0, column=0, padx=10, pady=10, sticky="w")
 
+        input_label = ttk.Label(input_output_panel, text="Введіть текст, щоб зашифрувати/розшифрувати")
         self.input_text = tk.Text(input_output_panel, height=10, width=40, wrap=tk.WORD)
         input_scrollbar = ttk.Scrollbar(input_output_panel, command=self.input_text.yview)
         self.input_text.config(yscrollcommand=input_scrollbar.set)
@@ -55,11 +56,12 @@ class XOR(Main):
         output_scrollbar = ttk.Scrollbar(input_output_panel, command=self.output_text.yview)
         self.output_text.config(yscrollcommand=output_scrollbar.set)
 
-        self.input_text.grid(row=0, column=0, padx=5, pady=5)
-        input_scrollbar.grid(row=0, column=1, sticky="ns")
-        output_label.grid(row=1, column=0, padx=5, pady=5)
-        self.output_text.grid(row=2, column=0, padx=5, pady=5)
-        output_scrollbar.grid(row=2, column=1, sticky="ns")
+        input_label.grid(row=0, column=0, padx=5, pady=5)
+        self.input_text.grid(row=1, column=0, padx=5, pady=5)
+        input_scrollbar.grid(row=1, column=1, sticky="ns")
+        output_label.grid(row=3, column=0, padx=5, pady=5)
+        self.output_text.grid(row=4, column=0, padx=5, pady=5)
+        output_scrollbar.grid(row=4, column=1, sticky="ns")
 
         input_output_panel.grid_rowconfigure(0, weight=1)
         input_output_panel.grid_columnconfigure(0, weight=1)
@@ -87,7 +89,7 @@ class XOR(Main):
             input_entry_label = ttk.Label(self.entry_panel, text="Введіть гамма ключ:")
             input_entry_label.grid(row=0, column=0, pady=5)
 
-            self.input_entry = ttk.Entry(self.entry_panel)
+            self.input_entry = tk.Text(self.entry_panel, width=20, height=5)
             self.input_entry.grid(row=0, column=1, pady=5)
 
             generate_button = ttk.Button(self.entry_panel, text="Згенерувати", command=self.generate_key)
@@ -144,8 +146,9 @@ class XOR(Main):
 
     def generate_key(self):
         key = self.gamma.generate_key(self.input_text.get("1.0", tk.END + "-1c"))
-        self.input_entry.delete(0, tk.END)
-        self.input_entry.insert(0, key)
+        self.input_entry.delete("1.0", tk.END)
+        self.input_entry.insert("1.0", key)
+        print("KEY: " + key)
 
     def generate_key_file(self):
         num_gammas = int(self.step_spinbox.get())
@@ -171,7 +174,7 @@ class XOR(Main):
 
     def encrypt(self):
         if self.radio_var.get() == "enter":
-            gamma_key = self.input_entry.get()
+            gamma_key = self.input_entry.get("1.0", tk.END + "-1c")
         elif self.radio_var.get() == "file":
             gamma_key = self.selected_gamma_entry.get()
         plaintext = self.input_text.get("1.0", tk.END + "-1c")
@@ -180,10 +183,11 @@ class XOR(Main):
         self.output_text.delete("1.0", tk.END)
         self.output_text.insert(tk.END, ciphertext)
         self.output_text.config(state=tk.DISABLED)
+        print("ШИФРОТЕКСТ: " + ciphertext)
 
     def decrypt(self):
         if self.radio_var.get() == "enter":
-            gamma_key = self.input_entry.get()
+            gamma_key = self.input_entry.get("1.0", tk.END + "-1c")
         elif self.radio_var.get() == "file":
             gamma_key = self.selected_gamma_entry.get()
         ciphertext = self.input_text.get("1.0", tk.END + "-1c")
@@ -192,4 +196,3 @@ class XOR(Main):
         self.output_text.delete("1.0", tk.END)
         self.output_text.insert(tk.END, plaintext)
         self.output_text.config(state=tk.DISABLED)
-
