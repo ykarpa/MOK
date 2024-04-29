@@ -27,9 +27,9 @@ class Main(tk.Tk):
         self.create_buttons()
 
     def create_buttons(self):
-        button_functions = [self.caesar_cipher, self.trithemius_cipher, self.xor_cipher, self.knapsack_cipher]
+        button_functions = [self.caesar_cipher, self.trithemius_cipher, self.xor_cipher, self.knapsack_cipher, self.rsa_cipher]
 
-        for i, button_text in enumerate(["Шифр Цезаря", "Шифр Тритеміуса", "Шифр Гамування", "Задача рюкзака"]):
+        for i, button_text in enumerate(["Шифр Цезаря", "Шифр Тритеміуса", "Шифр Гамування", "Задача рюкзака", "Шифр RSA"]):
             button = tk.Button(self.button_frame, text=button_text, command=button_functions[i], width=20, height=2)
             button.grid(row=i, column=0, pady=10)
 
@@ -54,6 +54,12 @@ class Main(tk.Tk):
     def knapsack_cipher(self):
         # self.destroy()
         pass
+
+    def rsa_cipher(self):
+        self.destroy()
+        from rsa import RSA
+        app = RSA()
+        app.mainloop()
 
     def create_file(self):
         self.input_text.delete("1.0", tk.END)

@@ -224,3 +224,72 @@ class GammaCipher:
         for i in range(len(ciphertext)):
             result += chr(ord(ciphertext[i]) ^ ord(gamma[i % len(gamma)]))
         return result
+
+
+class RSACipher:
+    @staticmethod
+    def is_prime(n):
+        for i in range(2, n):
+            if (n % i) == 0:
+                return False
+        return True
+
+    @staticmethod
+    def euler_func(p, q):
+        return (p - 1) * (q - 1)
+
+    @staticmethod
+    def extended_euclidean_algorithm(a, b):
+        if a == 0:
+            return b, 0, 1
+        gcd, x1, y1 = RSACipher.extended_euclidean_algorithm(b % a, a)
+        x = y1 - (b // a) * x1
+        y = x1
+        return gcd, x, y
+
+    @staticmethod
+    def modular_inverse(num, mod):
+        return RSACipher.extended_euclidean_algorithm(num, mod)[1] % mod
+
+    @staticmethod
+    def generate_keys(bit_length):
+        half_bit_length = bit_length // 2
+        while True:
+            p = random.randint(2 ** (half_bit_length - 1), 2 ** half_bit_length - 1)
+            if RSACipher.is_prime(p):
+                break
+        while True:
+            q = random.randint(2 ** (half_bit_length - 1), 2 ** half_bit_length - 1)
+            if RSACipher.is_prime(q) and p != q:
+                break
+
+        n = p * q
+
+        phi = RSACipher.euler_func(p, q)
+        while True:
+            e = random.randint(3, phi - 1)
+            if RSACipher.extended_euclidean_algorithm(e, phi)[0] == 1:
+                break
+        pub_key = (e, n)
+
+        d = RSACipher.modular_inverse(e, phi)
+        priv_key = (d, n)
+        return pub_key, priv_key
+
+    @staticmethod
+    def rsa_encrypt(public_key, plain_text):
+        e, n = public_key
+        try:
+            encrypted_text = pow(int(plain_text), e, n)
+        except ValueError:
+            encrypted_text = [pow(ord(char), e, n) for char in plain_text]
+        return encrypted_text
+
+    @staticmethod
+    def rsa_decrypt(private_key, encrypted_text):
+        d, n = private_key
+        try:
+            decrypted_text = str(pow(encrypted_text, d, n))
+        except TypeError:
+            decrypted_text = ''.join([chr(pow(char, d, n)) for char in encrypted_text])
+        return decrypted_text
