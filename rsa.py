@@ -9,7 +9,7 @@ class RSA(Main):
         super().__init__()
 
         self.title("Шифр RSA")
-        self.geometry("750x500")
+        self.geometry("700x500")
 
         self.rsa = RSACipher()
 
@@ -98,12 +98,15 @@ class RSA(Main):
         pub_key_str = self.pub_key_entry.get().strip()
         priv_key_str = self.priv_key_entry.get().strip()
 
-        try:
-            pub_key = eval(pub_key_str)
-            priv_key = eval(priv_key_str)
-        except SyntaxError:
-            messagebox.showerror("Помилка", "Невірний формат ключів")
-            return
+        # try:
+        #     pub_key = eval(pub_key_str)
+        #     priv_key = eval(priv_key_str)
+        # except SyntaxError:
+        #     messagebox.showerror("Помилка", "Невірний формат ключів")
+        #     return
+
+        pub_key = eval(pub_key_str)
+        priv_key = eval(priv_key_str)
 
         plaintext = self.input_text.get("1.0", tk.END).strip()
         if not plaintext:
@@ -118,12 +121,15 @@ class RSA(Main):
         pub_key_str = self.pub_key_entry.get().strip()
         priv_key_str = self.priv_key_entry.get().strip()
 
-        try:
-            pub_key = eval(pub_key_str)
-            priv_key = eval(priv_key_str)
-        except SyntaxError:
-            messagebox.showerror("Помилка", "Невірний формат ключів")
-            return
+        # try:
+        #     pub_key = eval(pub_key_str)
+        #     priv_key = eval(priv_key_str)
+        # except SyntaxError:
+        #     messagebox.showerror("Помилка", "Невірний формат ключів")
+        #     return
+
+        pub_key = eval(pub_key_str)
+        priv_key = eval(priv_key_str)
 
         encrypted_text = self.input_text.get("1.0", tk.END).strip()
         if not encrypted_text:
