@@ -293,3 +293,16 @@ class RSACipher:
         except TypeError:
             decrypted_text = ''.join([chr(pow(char, d, n)) for char in encrypted_text])
         return decrypted_text
+
+
+class Key_Exchange_DH:
+    @staticmethod
+    def generate_key_pair(p, g, private_key=None):
+      if private_key is None:
+          private_key = random.randint(2, p - 1)
+      public_key = pow(g, private_key) % p
+      return public_key, private_key
+
+    @staticmethod
+    def exchange_keys(p, public_key_B, private_key_A):
+      return pow(public_key_B, private_key_A) % p

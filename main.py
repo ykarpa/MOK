@@ -27,10 +27,10 @@ class Main(tk.Tk):
         self.create_buttons()
 
     def create_buttons(self):
-        button_functions = [self.caesar_cipher, self.trithemius_cipher, self.xor_cipher, self.knapsack_cipher, self.rsa_cipher]
+        button_functions = [self.caesar_cipher, self.trithemius_cipher, self.xor_cipher, self.knapsack_cipher, self.rsa_cipher, self.dh_key_exchange]
 
-        for i, button_text in enumerate(["Шифр Цезаря", "Шифр Тритеміуса", "Шифр Гамування", "Задача рюкзака", "Шифр RSA"]):
-            button = tk.Button(self.button_frame, text=button_text, command=button_functions[i], width=20, height=2)
+        for i, button_text in enumerate(["Шифр Цезаря", "Шифр Тритеміуса", "Шифр Гамування", "Задача рюкзака", "Шифр RSA", "Обмін ключами Діффі-Гелмана"]):
+            button = tk.Button(self.button_frame, text=button_text, command=button_functions[i], width=30, height=2, background="lightgrey")
             button.grid(row=i, column=0, pady=10)
 
     def caesar_cipher(self):
@@ -59,6 +59,12 @@ class Main(tk.Tk):
         self.destroy()
         from rsa import RSA
         app = RSA()
+        app.mainloop()
+
+    def dh_key_exchange(self):
+        self.destroy()
+        from dh import DH
+        app = DH()
         app.mainloop()
 
     def create_file(self):
