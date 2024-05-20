@@ -24,13 +24,6 @@ class DH(Main):
     def create_menu(self):
         self.menubar = tk.Menu(self)
 
-        file_menu = tk.Menu(self.menubar, tearoff=0)
-        file_menu.add_command(label="Створити", command=super().create_file)
-        file_menu.add_command(label="Відкрити", command=super().open_file)
-        file_menu.add_command(label="Зберегти", command=super().save_file)
-        file_menu.add_command(label="Друк", command=super().print_file)
-        self.menubar.add_cascade(label="Файл", menu=file_menu)
-
         self.menubar.add_command(label="Розробник", command=super().show_developer_info)
         self.menubar.add_command(label="Вихід", command=self.confirm_exit)
 
