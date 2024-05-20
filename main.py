@@ -52,8 +52,10 @@ class Main(tk.Tk):
         app.mainloop()
 
     def knapsack_cipher(self):
-        # self.destroy()
-        pass
+        self.destroy()
+        from knapsack import KnapsackTask
+        app = KnapsackTask()
+        app.mainloop()
 
     def rsa_cipher(self):
         self.destroy()

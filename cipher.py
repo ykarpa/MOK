@@ -1,4 +1,5 @@
 import random
+from math import gcd
 
 
 class CaesarCipher:
@@ -226,6 +227,71 @@ class GammaCipher:
         return result
 
 
+class KnapsackCipher:
+    def __init__(self, private_key=None, m=None, n=None):
+        self.private_key = private_key or []
+        self.m = m
+        self.n = n
+
+    def generate_keys(self):
+        rand = random.Random()
+        self.private_key = [2, 3, 7]
+        for i in range(3, 8):
+            self.private_key.append(2 * self.private_key[i - 1] + rand.randint(0, 9))
+        self.n = rand.randint(1, 99)
+        while True:
+            self.m = self.n * 20 + rand.randint(0, self.n * 10)
+            if gcd(self.m, self.n) == 1:
+                break
+
+    def encrypt(self, message):
+        public_key = [(x * self.n) % self.m for x in self.private_key]
+
+        sums = []
+        for c in message:
+            binary = ord(c)
+            sum_value = sum(((binary >> i) & 1) * public_key[7 - i] for i in range(8))
+            sums.append(sum_value)
+
+        return ','.join(map(str, sums))
+
+    def decrypt(self, message):
+        values = list(map(int, message.split(',')))
+        t = self.modular_inverse(self.n, self.m)
+
+        if t is None:
+            raise ValueError("Multiplicative inverse does not exist")
+
+        chars = []
+        for value in values:
+            sum_value = (value * t) % self.m
+            bits = [0] * 8
+            for i in range(7, -1, -1):
+                if sum_value >= self.private_key[i]:
+                    bits[i] = 1
+                    sum_value -= self.private_key[i]
+
+            num = 0
+            for bit in bits:
+                num = (num << 1) | bit
+
+            chars.append(chr(num))
+
+        return ''.join(chars)
+
+    def modular_inverse(self, a, m):
+        m0, x0, x1 = m, 0, 1
+        if m == 1:
+            return 0
+        while a > 1:
+            q = a // m
+            m, a = a % m, m
+            x0, x1 = x1 - q * x0, x0
+        if x1 < 0:
+            x1 += m0
+        return x1
+
+
 class RSACipher:
     @staticmethod
     def is_prime(n):
@@ -267,7 +333,7 @@ class RSACipher:
 
         phi = RSACipher.euler_func(p, q)
         while True:
-            e = random.randint(3, phi - 1)
+            e = random.randint(2, phi - 1)
             if RSACipher.extended_euclidean_algorithm(e, phi)[0] == 1:
                 break
         pub_key = (e, n)
